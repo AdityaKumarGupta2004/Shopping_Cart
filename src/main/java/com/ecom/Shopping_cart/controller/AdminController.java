@@ -53,7 +53,7 @@ public class AdminController {
         m.addAttribute("categorys", categoryService.getAllCategory());
         return "admin/category";
     }
-
+// for the products and categories
     @PostMapping("/saveCategory")
     public String saveCategory(@ModelAttribute Category category, @RequestParam("file") MultipartFile file,
             HttpSession session) throws IOException {
