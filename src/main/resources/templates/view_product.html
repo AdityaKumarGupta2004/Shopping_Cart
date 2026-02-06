@@ -14,12 +14,12 @@
 				<div class="row">
 					<th:block th:if="${session.succMsg}">
 						<p class="text-success alert alert-success text-center" role="alert">[[${session.succMsg}]]</p>
-						<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+						<th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
 					</th:block>
 
 					<th:block th:if="${session.errorMsg}">
 						<p class="text-danger text-center  alert alert-danger">[[${session.errorMsg}]]</p>
-						<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+						<th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
 
 					</th:block>
 					<div class="col-md-6 text-end">
@@ -49,7 +49,7 @@
 							Days Replacement & Return
 						</p>
 						<p class="fs-5 fw-bold">
-							Price :&nbsp; &nbsp; &nbsp; &nbsp;<th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block>
+							Price :&nbsp; &nbsp; &nbsp; &nbsp;<th:block th:utext="${@commonServiceImpl.rupeeSign()}"></th:block>
 							[[${product.discountPrice}]] <span
 								class="fs-6 text-decoration-line-through text-secondary">[[${product.price}]]</span>
 							<span class="fs-6  text-success">[[${product.discount}]]%

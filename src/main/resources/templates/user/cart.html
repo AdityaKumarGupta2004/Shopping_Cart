@@ -14,12 +14,12 @@
 					<p class="fs-4">Cart Page</p>
 					<th:block th:if="${session.succMsg}">
 						<p class="text-success fw-bold">[[${session.succMsg}]]</p>
-						<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+						<th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
 					</th:block>
 
 					<th:block th:if="${session.errorMsg}">
 						<p class="text-danger fw-bold">[[${session.errorMsg}]]</p>
-						<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+						<th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
 					</th:block>
 				</div>
 				<div class="card-body">
@@ -54,7 +54,7 @@
 							<tr>
 								<td colspan="4"></td>
 								<td class="fw-bold">Total Price</td>
-								<td class="fw-bold"><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${totalOrderPrice}]]</td>
+								<td class="fw-bold"><th:block th:utext="${@commonServiceImpl.rupeeSign()}"></th:block> [[${totalOrderPrice}]]</td>
 							</tr>
 
 						</tbody>

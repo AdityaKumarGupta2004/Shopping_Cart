@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.ecom.Shopping_cart.model.Category;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 
 public interface CategoryService {

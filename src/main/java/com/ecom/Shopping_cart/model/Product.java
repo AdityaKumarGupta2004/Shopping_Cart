@@ -1,5 +1,6 @@
 package com.ecom.Shopping_cart.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,16 +15,24 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-public class Category {
+public class Product {
 
-    @Id
+	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
-	private String name;
+	@Column(length = 500)
+	private String title;
 
-	private String imageName;
+	@Column(length = 5000)
+	private String description;
 
-	private Boolean isActive;
+	private String category;
+
+	private Double price;
+
+	private int stock;
+
+	private String image;
 
 }
