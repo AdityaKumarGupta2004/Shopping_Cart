@@ -9,6 +9,8 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import com.ecom.Shopping_cart.model.Category;
+import com.ecom.Shopping_cart.model.UserDtls;
+import com.ecom.Shopping_cart.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Controller;
@@ -35,8 +37,8 @@ public class HomeController {
 	@Autowired
 	private ProductService productService;
 
-	// @Autowired
-	// private UserService userService;
+	 @Autowired
+	 private UserService userService;
 
 	@GetMapping("/")
 	public String index() {
@@ -70,7 +72,7 @@ public class HomeController {
 		m.addAttribute("product", productById);
 		return "view_product";
 	}
-/*
+
 	@PostMapping("/saveUser")
 	public String saveUser(@ModelAttribute UserDtls user, @RequestParam("img") MultipartFile file, HttpSession session)
 			throws IOException {
@@ -96,5 +98,5 @@ public class HomeController {
 
 		return "redirect:/register";
 	}
-*/
+
 }
