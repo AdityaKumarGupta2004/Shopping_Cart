@@ -2,6 +2,7 @@ package com.ecom.Shopping_cart.controller;
 
 import com.ecom.Shopping_cart.model.Category;
 import com.ecom.Shopping_cart.model.Product;
+import com.ecom.Shopping_cart.model.UserDtls;
 import com.ecom.Shopping_cart.service.CategoryService;
 import com.ecom.Shopping_cart.service.ProductService;
 
@@ -11,8 +12,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.security.Principal;
 import java.util.List;
 
+import com.ecom.Shopping_cart.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Controller;
@@ -38,6 +41,21 @@ public class AdminController {
 	@Autowired
 	private ProductService productService;
 
+	@Autowired
+	private UserService userService;
+
+	@ModelAttribute
+	public void getUserDetails(Principal p, Model m) {
+		if (p != null) {
+			String email = p.getName();
+			UserDtls userDtls = userService.getUserByEmail(email);
+			m.addAttribute("user", userDtls);
+		}
+
+		List<Category> allActiveCategory = categoryService.getAllActiveCategory();
+		m.addAttribute("categorys", allActiveCategory);
+	}
+
 	@GetMapping("/")
 	public String index() {
 		return "admin/index";
@@ -58,7 +76,7 @@ public class AdminController {
 
 	@PostMapping("/saveCategory")
 	public String saveCategory(@ModelAttribute Category category, @RequestParam("file") MultipartFile file,
-			HttpSession session) throws IOException {
+							   HttpSession session) throws IOException {
 
 		String imageName = file != null ? file.getOriginalFilename() : "default.jpg";
 		category.setImageName(imageName);
@@ -111,7 +129,7 @@ public class AdminController {
 
 	@PostMapping("/updateCategory")
 	public String updateCategory(@ModelAttribute Category category, @RequestParam("file") MultipartFile file,
-			HttpSession session) throws IOException {
+								 HttpSession session) throws IOException {
 
 		Category oldCategory = categoryService.getCategoryById(category.getId());
 		String imageName = file.isEmpty() ? oldCategory.getImageName() : file.getOriginalFilename();
@@ -147,7 +165,7 @@ public class AdminController {
 
 	@PostMapping("/saveProduct")
 	public String saveProduct(@ModelAttribute Product product, @RequestParam("file") MultipartFile image,
-			HttpSession session) throws IOException {
+							  HttpSession session) throws IOException {
 
 		String imageName = image.isEmpty() ? "default.jpg" : image.getOriginalFilename();
 
@@ -200,7 +218,7 @@ public class AdminController {
 
 	@PostMapping("/updateProduct")
 	public String updateProduct(@ModelAttribute Product product, @RequestParam("file") MultipartFile image,
-			HttpSession session, Model m) {
+								HttpSession session, Model m) {
 
 		if (product.getDiscount() < 0 || product.getDiscount() > 100) {
 			session.setAttribute("errorMsg", "invalid Discount");
@@ -213,6 +231,24 @@ public class AdminController {
 			}
 		}
 		return "redirect:/admin/editProduct/" + product.getId();
+	}
+
+	@GetMapping("/users")
+	public String getAllUsers(Model m) {
+		List<UserDtls> users = userService.getUsers("ROLE_USER");
+		m.addAttribute("users", users);
+		return "/admin/users";
+	}
+
+	@GetMapping("/updateSts")
+	public String updateUserAccountStatus(@RequestParam Boolean status, @RequestParam Integer id, HttpSession session) {
+		Boolean f = userService.updateAccountStatus(id, status);
+		if (f) {
+			session.setAttribute("succMsg", "Account Status Updated");
+		} else {
+			session.setAttribute("errorMsg", "Something wrong on server");
+		}
+		return "redirect:/admin/users";
 	}
 
 }

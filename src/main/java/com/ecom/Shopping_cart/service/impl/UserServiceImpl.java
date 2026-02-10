@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import com.ecom.Shopping_cart.util.AppConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -76,17 +77,17 @@ public class UserServiceImpl implements UserService {
     public boolean unlockAccountTimeExpired(UserDtls user) {
 
         long lockTime = user.getLockTime().getTime();
-////        long unLockTime = lockTime + AppConstant.UNLOCK_DURATION_TIME;
-//
-//        long currentTime = System.currentTimeMillis();
-//
-//        if (unLockTime < currentTime) {
-//            user.setAccountNonLocked(true);
-//            user.setFailedAttempt(0);
-//            user.setLockTime(null);
-//            userRepository.save(user);
-//            return true;
-//        }
+       long unLockTime = lockTime + AppConstant.UNLOCK_DURATION_TIME;
+
+       long currentTime = System.currentTimeMillis();
+
+       if (unLockTime < currentTime) {
+           user.setAccountNonLocked(true);
+           user.setFailedAttempt(0);
+           user.setLockTime(null);
+           userRepository.save(user);
+           return true;
+       }
 
         return false;
     }

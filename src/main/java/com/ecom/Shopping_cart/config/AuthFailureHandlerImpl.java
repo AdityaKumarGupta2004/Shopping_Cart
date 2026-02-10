@@ -6,16 +6,15 @@ import com.ecom.Shopping_cart.model.UserDtls;
 import com.ecom.Shopping_cart.repository.UserRepository;
 import com.ecom.Shopping_cart.service.UserService;
 import com.ecom.Shopping_cart.util.AppConstant;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
-
-
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 public class AuthFailureHandlerImpl extends SimpleUrlAuthenticationFailureHandler {
@@ -27,15 +26,37 @@ public class AuthFailureHandlerImpl extends SimpleUrlAuthenticationFailureHandle
     private UserService userService;
 
     @Override
-    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
-                                        AuthenticationException exception) throws IOException, ServletException {
+    public void onAuthenticationFailure(HttpServletRequest request,
+                                        HttpServletResponse response,
+                                        AuthenticationException exception)
+            throws IOException, ServletException {
 
         String email = request.getParameter("username");
 
+        // ✅ If username/email is empty
+        if (email == null || email.trim().isEmpty()) {
+            super.setDefaultFailureUrl("/signin?error");
+            super.onAuthenticationFailure(request, response, exception);
+            return;
+        }
+
         UserDtls userDtls = userRepository.findByEmail(email);
 
-        if (userDtls.getIsEnable()) {
+        // ✅ IMPORTANT: if user not found, don't do getIsEnable()
+        if (userDtls == null) {
+            super.setDefaultFailureUrl("/signin?error");
+            super.onAuthenticationFailure(request, response, exception);
+            return;
+        }
 
+        // If user is inactive
+        if (!userDtls.getIsEnable()) {
+            exception = new LockedException("your account is inactive");
+        }
+        // If user is active
+        else {
+
+            // If account is not locked
             if (userDtls.getAccountNonLocked()) {
 
                 if (userDtls.getFailedAttempt() < AppConstant.ATTEMPT_TIME) {
@@ -44,7 +65,10 @@ public class AuthFailureHandlerImpl extends SimpleUrlAuthenticationFailureHandle
                     userService.userAccountLock(userDtls);
                     exception = new LockedException("Your account is locked !! failed attempt 3");
                 }
-            } else {
+
+            }
+            // If account is locked
+            else {
 
                 if (userService.unlockAccountTimeExpired(userDtls)) {
                     exception = new LockedException("Your account is unlocked !! Please try to login");
@@ -52,13 +76,9 @@ public class AuthFailureHandlerImpl extends SimpleUrlAuthenticationFailureHandle
                     exception = new LockedException("your account is Locked !! Please try after sometimes");
                 }
             }
-
-        } else {
-            exception = new LockedException("your account is inactive");
         }
 
         super.setDefaultFailureUrl("/signin?error");
         super.onAuthenticationFailure(request, response, exception);
     }
-
 }
