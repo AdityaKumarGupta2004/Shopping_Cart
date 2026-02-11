@@ -61,6 +61,7 @@ public class AuthFailureHandlerImpl extends SimpleUrlAuthenticationFailureHandle
 
                 if (userDtls.getFailedAttempt() < AppConstant.ATTEMPT_TIME) {
                     userService.increaseFailedAttempt(userDtls);
+                    exception = new LockedException("failed attempt " + userDtls.getFailedAttempt());
                 } else {
                     userService.userAccountLock(userDtls);
                     exception = new LockedException("Your account is locked !! failed attempt 3");
