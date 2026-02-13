@@ -2,13 +2,17 @@ package com.ecom.Shopping_cart.controller;
 
 import com.ecom.Shopping_cart.model.Cart;
 import com.ecom.Shopping_cart.model.Category;
+import com.ecom.Shopping_cart.model.OrderRequest;
+import com.ecom.Shopping_cart.model.ProductOrder;
 import com.ecom.Shopping_cart.model.UserDtls;
 import com.ecom.Shopping_cart.service.CartService;
 import com.ecom.Shopping_cart.service.CategoryService;
+import com.ecom.Shopping_cart.service.OrderService;
 import com.ecom.Shopping_cart.service.UserService;
 import java.security.Principal;
 import java.util.List;
 
+import com.ecom.Shopping_cart.util.OrderStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,7 +28,7 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 @RequestMapping("/user")
 public class UserController {
-@Autowired
+	@Autowired
 	private UserService userService;
 	@Autowired
 	private CategoryService categoryService;
@@ -32,8 +36,8 @@ public class UserController {
 	@Autowired
 	private CartService cartService;
 
-//	@Autowired
-//	private OrderService orderService;
+	@Autowired
+	private OrderService orderService;
 
 	@GetMapping("/")
 	public String home() {
@@ -105,48 +109,48 @@ public class UserController {
 		return "/user/order";
 	}
 
-	// @PostMapping("/save-order")
-	// public String saveOrder(@ModelAttribute OrderRequest request, Principal p) {
-	// 	// System.out.println(request);
-	// 	UserDtls user = getLoggedInUserDetails(p);
-	// 	orderService.saveOrder(user.getId(), request);
+	@PostMapping("/save-order")
+	public String saveOrder(@ModelAttribute OrderRequest request, Principal p) {
+		// System.out.println(request);
+		UserDtls user = getLoggedInUserDetails(p);
+		orderService.saveOrder(user.getId(), request);
 
-	// 	return "redirect:/user/success";
-	// }
+		return "redirect:/user/success";
+	}
 
-	// @GetMapping("/success")
-	// public String loadSuccess() {
-	// 	return "/user/success";
-	// }
+	@GetMapping("/success")
+	public String loadSuccess() {
+		return "/user/success";
+	}
 
-	// @GetMapping("/user-orders")
-	// public String myOrder(Model m, Principal p) {
-	// 	UserDtls loginUser = getLoggedInUserDetails(p);
-	// 	List<ProductOrder> orders = orderService.getOrdersByUser(loginUser.getId());
-	// 	m.addAttribute("orders", orders);
-	// 	return "/user/my_orders";
-	// }
+	@GetMapping("/user-orders")
+	public String myOrder(Model m, Principal p) {
+		UserDtls loginUser = getLoggedInUserDetails(p);
+		List<ProductOrder> orders = orderService.getOrdersByUser(loginUser.getId());
+		m.addAttribute("orders", orders);
+		return "/user/my_orders";
+	}
 
-	// @GetMapping("/update-status")
-	// public String updateOrderStatus(@RequestParam Integer id, @RequestParam Integer st, HttpSession session) {
+	@GetMapping("/update-status")
+	public String updateOrderStatus(@RequestParam Integer id, @RequestParam Integer st, HttpSession session) {
 
-	// 	OrderStatus[] values = OrderStatus.values();
-	// 	String status = null;
+		OrderStatus[] values = OrderStatus.values();
+		String status = null;
 
-	// 	for (OrderStatus orderSt : values) {
-	// 		if (orderSt.getId().equals(st)) {
-	// 			status = orderSt.getName();
-	// 		}
-	// 	}
+		for (OrderStatus orderSt : values) {
+			if (orderSt.getId().equals(st)) {
+				status = orderSt.getName();
+			}
+		}
 
-	// 	Boolean updateOrder = orderService.updateOrderStatus(id, status);
+		Boolean updateOrder = orderService.updateOrderStatus(id, status);
 
-	// 	if (updateOrder) {
-	// 		session.setAttribute("succMsg", "Status Updated");
-	// 	} else {
-	// 		session.setAttribute("errorMsg", "status not updated");
-	// 	}
-	// 	return "redirect:/user/user-orders";
-	// }
+		if (updateOrder) {
+			session.setAttribute("succMsg", "Status Updated");
+		} else {
+			session.setAttribute("errorMsg", "status not updated");
+		}
+		return "redirect:/user/user-orders";
+	}
 
 }
