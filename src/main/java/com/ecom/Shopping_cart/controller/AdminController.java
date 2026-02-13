@@ -49,7 +49,7 @@ public class AdminController {
 		if (p != null) {
 			String email = p.getName();
 			UserDtls userDtls = userService.getUserByEmail(email);
-			m.addAttribute("user", userDtls);
+			m.addAttribute("user", userDtls);// storing in the modelsttribute , that thymeleaf should use it
 		}
 
 		List<Category> allActiveCategory = categoryService.getAllActiveCategory();
