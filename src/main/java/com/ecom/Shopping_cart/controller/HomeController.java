@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ecom.Shopping_cart.model.Product;
+import com.ecom.Shopping_cart.service.CartService;
 import com.ecom.Shopping_cart.service.CategoryService;
 import com.ecom.Shopping_cart.service.ProductService;
 import jakarta.servlet.http.HttpSession;
@@ -35,8 +36,7 @@ import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class HomeController {
-
-	@Autowired
+@Autowired
 	private CategoryService categoryService;
 
 	@Autowired
@@ -49,15 +49,19 @@ public class HomeController {
 	private CommonUtil commonUtil;
 
 	@Autowired
-	private PasswordEncoder passwordEncoder;
+	private BCryptPasswordEncoder passwordEncoder;
 
-	
+	@Autowired
+	private CartService cartService;
+
 	@ModelAttribute
 	public void getUserDetails(Principal p, Model m) {
 		if (p != null) {
 			String email = p.getName();
 			UserDtls userDtls = userService.getUserByEmail(email);
 			m.addAttribute("user", userDtls);
+			Integer countCart = cartService.getCountCart(userDtls.getId());
+			m.addAttribute("countCart", countCart);
 		}
 
 		List<Category> allActiveCategory = categoryService.getAllActiveCategory();
@@ -185,9 +189,9 @@ public class HomeController {
 			userByToken.setPassword(passwordEncoder.encode(password));
 			userByToken.setResetToken(null);
 			userService.updateUser(userByToken);
-			//session.setAttribute("succMsg", "Password change successfully");
-			m.addAttribute("msg","Password change successfully");
-			
+			// session.setAttribute("succMsg", "Password change successfully");
+			m.addAttribute("msg", "Password change successfully");
+
 			return "message";
 		}
 
