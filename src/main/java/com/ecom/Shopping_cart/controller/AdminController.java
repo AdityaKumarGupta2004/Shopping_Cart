@@ -18,6 +18,7 @@ import java.security.Principal;
 import java.util.List;
 
 import com.ecom.Shopping_cart.service.UserService;
+import com.ecom.Shopping_cart.util.CommonUtil;
 import com.ecom.Shopping_cart.util.OrderStatus;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,9 @@ public class AdminController {
 
 	@Autowired
 	private OrderService orderService;
+
+	@Autowired
+	private CommonUtil commonUtil;
 
 	@ModelAttribute
 	public void getUserDetails(Principal p, Model m) {
@@ -267,6 +271,7 @@ public class AdminController {
 	@PostMapping("/update-order-status")
 	public String updateOrderStatus(@RequestParam Integer id, @RequestParam Integer st, HttpSession session) {
 
+		
 		OrderStatus[] values = OrderStatus.values();
 		String status = null;
 
@@ -276,14 +281,21 @@ public class AdminController {
 			}
 		}
 
-		Boolean updateOrder = orderService.updateOrderStatus(id, status);
+		ProductOrder updateOrder = orderService.updateOrderStatus(id, status);
 
-		if (updateOrder) {
+		try {
+			commonUtil.sendMailForProductOrder(updateOrder, status);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		if (!ObjectUtils.isEmpty(updateOrder)) {
 			session.setAttribute("succMsg", "Status Updated");
 		} else {
 			session.setAttribute("errorMsg", "status not updated");
 		}
 		return "redirect:/admin/orders";
 	}
+	
 
 }
