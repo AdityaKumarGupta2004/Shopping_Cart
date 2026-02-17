@@ -2,8 +2,10 @@ package com.ecom.Shopping_cart.controller;
 
 import com.ecom.Shopping_cart.model.Category;
 import com.ecom.Shopping_cart.model.Product;
+import com.ecom.Shopping_cart.model.ProductOrder;
 import com.ecom.Shopping_cart.model.UserDtls;
 import com.ecom.Shopping_cart.service.CategoryService;
+import com.ecom.Shopping_cart.service.OrderService;
 import com.ecom.Shopping_cart.service.ProductService;
 
 import java.io.File;
@@ -16,6 +18,8 @@ import java.security.Principal;
 import java.util.List;
 
 import com.ecom.Shopping_cart.service.UserService;
+import com.ecom.Shopping_cart.util.OrderStatus;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Controller;
@@ -43,6 +47,9 @@ public class AdminController {
 
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private OrderService orderService;
 
 	@ModelAttribute
 	public void getUserDetails(Principal p, Model m) {
@@ -249,6 +256,34 @@ public class AdminController {
 			session.setAttribute("errorMsg", "Something wrong on server");
 		}
 		return "redirect:/admin/users";
+	}
+	@GetMapping("/orders")
+	public String getAllOrders(Model m) {
+		List<ProductOrder> allOrders = orderService.getAllOrders();
+		m.addAttribute("orders", allOrders);
+		return "/admin/orders";
+	}
+	
+	@PostMapping("/update-order-status")
+	public String updateOrderStatus(@RequestParam Integer id, @RequestParam Integer st, HttpSession session) {
+
+		OrderStatus[] values = OrderStatus.values();
+		String status = null;
+
+		for (OrderStatus orderSt : values) {
+			if (orderSt.getId().equals(st)) {
+				status = orderSt.getName();
+			}
+		}
+
+		Boolean updateOrder = orderService.updateOrderStatus(id, status);
+
+		if (updateOrder) {
+			session.setAttribute("succMsg", "Status Updated");
+		} else {
+			session.setAttribute("errorMsg", "status not updated");
+		}
+		return "redirect:/admin/orders";
 	}
 
 }

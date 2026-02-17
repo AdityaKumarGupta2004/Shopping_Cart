@@ -72,15 +72,19 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Boolean updateOrderStatus(Integer id, String status) {
+    public ProductOrder updateOrderStatus(Integer id, String status) {
         Optional<ProductOrder> findById = orderRepository.findById(id);
         if (findById.isPresent()) {
             ProductOrder productOrder = findById.get();
             productOrder.setStatus(status);
-            orderRepository.save(productOrder);
-            return true;
+            return orderRepository.save(productOrder);
+           
         }
-        return false;
+        return null;
     }
+    @Override
+	public List<ProductOrder> getAllOrders() {
+		return orderRepository.findAll();
+	}
 
 }
