@@ -4,6 +4,7 @@ import com.ecom.Shopping_cart.model.Category;
 import com.ecom.Shopping_cart.model.Product;
 import com.ecom.Shopping_cart.model.ProductOrder;
 import com.ecom.Shopping_cart.model.UserDtls;
+import com.ecom.Shopping_cart.service.CartService;
 import com.ecom.Shopping_cart.service.CategoryService;
 import com.ecom.Shopping_cart.service.OrderService;
 import com.ecom.Shopping_cart.service.ProductService;
@@ -50,6 +51,9 @@ public class AdminController {
 	private UserService userService;
 
 	@Autowired
+	private CartService cartService;
+
+	@Autowired
 	private OrderService orderService;
 
 	@Autowired
@@ -60,7 +64,9 @@ public class AdminController {
 		if (p != null) {
 			String email = p.getName();
 			UserDtls userDtls = userService.getUserByEmail(email);
-			m.addAttribute("user", userDtls);// storing in the modelsttribute , that thymeleaf should use it
+			m.addAttribute("user", userDtls);
+			Integer countCart = cartService.getCountCart(userDtls.getId());
+			m.addAttribute("countCart", countCart);
 		}
 
 		List<Category> allActiveCategory = categoryService.getAllActiveCategory();
@@ -87,7 +93,7 @@ public class AdminController {
 
 	@PostMapping("/saveCategory")
 	public String saveCategory(@ModelAttribute Category category, @RequestParam("file") MultipartFile file,
-							   HttpSession session) throws IOException {
+			HttpSession session) throws IOException {
 
 		String imageName = file != null ? file.getOriginalFilename() : "default.jpg";
 		category.setImageName(imageName);
@@ -140,7 +146,7 @@ public class AdminController {
 
 	@PostMapping("/updateCategory")
 	public String updateCategory(@ModelAttribute Category category, @RequestParam("file") MultipartFile file,
-								 HttpSession session) throws IOException {
+			HttpSession session) throws IOException {
 
 		Category oldCategory = categoryService.getCategoryById(category.getId());
 		String imageName = file.isEmpty() ? oldCategory.getImageName() : file.getOriginalFilename();
@@ -176,7 +182,7 @@ public class AdminController {
 
 	@PostMapping("/saveProduct")
 	public String saveProduct(@ModelAttribute Product product, @RequestParam("file") MultipartFile image,
-							  HttpSession session) throws IOException {
+			HttpSession session) throws IOException {
 
 		String imageName = image.isEmpty() ? "default.jpg" : image.getOriginalFilename();
 
@@ -204,8 +210,14 @@ public class AdminController {
 	}
 
 	@GetMapping("/products")
-	public String loadViewProduct(Model m) {
-		m.addAttribute("products", productService.getAllProducts());
+	public String loadViewProduct(Model m, @RequestParam(defaultValue = "") String ch) {
+		List<Product> products = null;
+		if (ch != null && ch.length() > 0) {
+			products = productService.searchProduct(ch);
+		} else {
+			products = productService.getAllProducts();
+		}
+		m.addAttribute("products", products);
 		return "admin/products";
 	}
 
@@ -229,7 +241,7 @@ public class AdminController {
 
 	@PostMapping("/updateProduct")
 	public String updateProduct(@ModelAttribute Product product, @RequestParam("file") MultipartFile image,
-								HttpSession session, Model m) {
+			HttpSession session, Model m) {
 
 		if (product.getDiscount() < 0 || product.getDiscount() > 100) {
 			session.setAttribute("errorMsg", "invalid Discount");
@@ -261,17 +273,18 @@ public class AdminController {
 		}
 		return "redirect:/admin/users";
 	}
+
 	@GetMapping("/orders")
 	public String getAllOrders(Model m) {
 		List<ProductOrder> allOrders = orderService.getAllOrders();
 		m.addAttribute("orders", allOrders);
+		m.addAttribute("srch", false);
 		return "/admin/orders";
 	}
-	
+
 	@PostMapping("/update-order-status")
 	public String updateOrderStatus(@RequestParam Integer id, @RequestParam Integer st, HttpSession session) {
 
-		
 		OrderStatus[] values = OrderStatus.values();
 		String status = null;
 
@@ -296,6 +309,30 @@ public class AdminController {
 		}
 		return "redirect:/admin/orders";
 	}
-	
+
+	@GetMapping("/search-order")
+	public String searchProduct(@RequestParam String orderId, Model m, HttpSession session) {
+
+		if (orderId != null && orderId.length() > 0) {
+
+			ProductOrder order = orderService.getOrdersByOrderId(orderId.trim());
+
+			if (ObjectUtils.isEmpty(order)) {
+				session.setAttribute("errorMsg", "Incorrect orderId");
+				m.addAttribute("orderDtls", null);
+			} else {
+				m.addAttribute("orderDtls", order);
+			}
+
+			m.addAttribute("srch", true);
+		} else {
+			List<ProductOrder> allOrders = orderService.getAllOrders();
+			m.addAttribute("orders", allOrders);
+			m.addAttribute("srch", false);
+		}
+		return "/admin/orders";
+
+	}
+
 
 }

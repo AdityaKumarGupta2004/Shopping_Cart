@@ -10,6 +10,8 @@ import com.ecom.Shopping_cart.model.ProductOrder;
 
 public interface ProductOrderRepository extends JpaRepository<ProductOrder, Integer> {
 
-	List<ProductOrder> findByUserId(Integer userId);
+		List<ProductOrder> findByUserId(Integer userId);
+
+	ProductOrder findByOrderId(String orderId);
 
 }
