@@ -8,6 +8,9 @@ import java.util.UUID;
 import com.ecom.Shopping_cart.util.CommonUtil;
 import com.ecom.Shopping_cart.util.OrderStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.ecom.Shopping_cart.model.Cart;
 import com.ecom.Shopping_cart.model.OrderAddress;
@@ -21,12 +24,12 @@ import com.ecom.Shopping_cart.service.OrderService;
 @Service
 public class OrderServiceImpl implements OrderService {
 
- @Autowired
+	@Autowired
 	private ProductOrderRepository orderRepository;
 
 	@Autowired
 	private CartRepository cartRepository;
-	
+
 	@Autowired
 	private CommonUtil commonUtil;
 
@@ -89,6 +92,13 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public List<ProductOrder> getAllOrders() {
 		return orderRepository.findAll();
+	}
+
+	@Override
+	public Page<ProductOrder> getAllOrdersPagination(Integer pageNo, Integer pageSize) {
+		Pageable pageable = PageRequest.of(pageNo, pageSize);
+		return orderRepository.findAll(pageable);
+
 	}
 
 	@Override
