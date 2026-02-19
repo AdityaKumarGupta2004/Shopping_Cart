@@ -83,7 +83,7 @@ public class UserController {
 	@GetMapping("/cart")
 	public String loadCartPage(Principal p, Model m) {
 
-		UserDtls user = getLoggedInUserDetails(p);
+		UserDtls user = commonUtil.getLoggedInUserDetails(p);
 		List<Cart> carts = cartService.getCartsByUser(user.getId());
 		m.addAttribute("carts", carts);
 		if (carts.size() > 0) {
@@ -99,15 +99,11 @@ public class UserController {
 		return "redirect:/user/cart";
 	}
 
-	private UserDtls getLoggedInUserDetails(Principal p) {
-		String email = p.getName();
-		UserDtls userDtls = userService.getUserByEmail(email);
-		return userDtls;
-	}
+	
 
 	@GetMapping("/orders")
 	public String orderPage(Principal p, Model m) {
-		UserDtls user = getLoggedInUserDetails(p);
+		UserDtls user = commonUtil.getLoggedInUserDetails(p);
 		List<Cart> carts = cartService.getCartsByUser(user.getId());
 		m.addAttribute("carts", carts);
 		if (carts.size() > 0) {
@@ -122,7 +118,7 @@ public class UserController {
 	@PostMapping("/save-order")
 	public String saveOrder(@ModelAttribute OrderRequest request, Principal p) throws Exception {
 		// System.out.println(request);
-		UserDtls user = getLoggedInUserDetails(p);
+		UserDtls user = commonUtil.getLoggedInUserDetails(p);
 		orderService.saveOrder(user.getId(), request);
 
 		return "redirect:/user/success";
@@ -135,7 +131,7 @@ public class UserController {
 
 	@GetMapping("/user-orders")
 	public String myOrder(Model m, Principal p) {
-		UserDtls loginUser = getLoggedInUserDetails(p);
+		UserDtls loginUser = commonUtil.getLoggedInUserDetails(p);
 		List<ProductOrder> orders = orderService.getOrdersByUser(loginUser.getId());
 		m.addAttribute("orders", orders);
 		return "/user/my_orders";
@@ -188,7 +184,7 @@ public class UserController {
 	@PostMapping("/change-password")
 	public String changePassword(@RequestParam String newPassword, @RequestParam String currentPassword, Principal p,
 			HttpSession session) {
-		UserDtls loggedInUserDetails = getLoggedInUserDetails(p);
+		UserDtls loggedInUserDetails = commonUtil.getLoggedInUserDetails(p);
 
 		boolean matches = passwordEncoder.matches(currentPassword, loggedInUserDetails.getPassword());
 

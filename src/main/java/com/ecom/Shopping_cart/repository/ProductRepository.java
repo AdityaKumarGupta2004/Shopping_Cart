@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 
 public interface ProductRepository extends JpaRepository<Product,Integer> {
-   List<Product> findByIsActiveTrue();
+ List<Product> findByIsActiveTrue();
 
 	Page<Product> findByIsActiveTrue(Pageable pageable);
 
@@ -18,8 +18,12 @@ public interface ProductRepository extends JpaRepository<Product,Integer> {
 
 	List<Product> findByTitleContainingIgnoreCaseOrCategoryContainingIgnoreCase(String ch, String ch2);
 
-	Page<Product> findByCategory(Pageable pageable,String category);
+	Page<Product> findByCategory(Pageable pageable, String category);
 
-	Page<Product> findByTitleContainingIgnoreCaseOrCategoryContainingIgnoreCase(String ch, String ch2, Pageable pageable);
+	Page<Product> findByTitleContainingIgnoreCaseOrCategoryContainingIgnoreCase(String ch, String ch2,
+			Pageable pageable);
+
+	Page<Product> findByisActiveTrueAndTitleContainingIgnoreCaseOrCategoryContainingIgnoreCase(String ch, String ch2,
+			Pageable pageable);
 
 }

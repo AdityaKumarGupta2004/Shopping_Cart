@@ -7,7 +7,7 @@ import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
-   public UserDtls saveUser(UserDtls user);
+  public UserDtls saveUser(UserDtls user);
 
 	public UserDtls getUserByEmail(String email);
 
@@ -30,5 +30,7 @@ public interface UserService {
 	public UserDtls updateUser(UserDtls user);
 	
 	public UserDtls updateUserProfile(UserDtls user,MultipartFile img);
+	
+	public UserDtls saveAdmin(UserDtls user);
 
 }
